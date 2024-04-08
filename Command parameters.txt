@@ -1,0 +1,40 @@
+cmake .. -G "Visual Studio 14 2015 Win64"
+
+#iPSM
+参数个数：7
+	输入环境因子图层文件名（以#分割），参数符号 -inlayers
+	每个环境因子图层的数据类型，包含类别型(categorical)和连续型(continuous)，（以#分割），参数符号 -datatypes
+	样点数据文件名(csv格式)，文件中包含样点地理坐标(名为:x,y,大小写均可,并且与环境因子图层的空间参考对应)和要推测的属性值，参数符号 -sample
+	要推测的属性名(存在于样点文件的表头中)，参数符号 -target
+	环境相似度阈值，默认值0.5（可选），参数符号 -simithred
+	输出的推测图层文件名， 参数符号 -predmap
+	输出的不确定性文件名，参数符号 -uncmap
+
+	参考示例
+	params = "-inlayers D:/study/data/test/xc/dem.tif#D:/study/data/test/xc/geo.tif -datatypes continuous#categorical -sample D:/study/data/test/xc/xc_represent_samples.csv -target SOMB -simithred 0.5 -predmap D:/study/data/test/xc/results/pred_ipsmFilter.tif -uncmap D:/study/data/test/xc/results/uncer_ipsmFilter.tif"
+	
+#iPSMFilter 
+参数个数：8
+    输入环境因子图层文件名（以#分割），参数符号 -inlayers
+    每个环境因子图层的数据类型，包含类别型(categorical)和连续型(continuous)，（以#分割），参数符号 -datatypes
+    每个环境因子图层的环境变量类型，包含地质(geology)、地形(terrain)、气候（climate）和植被（vegetation），（以#分割），可选，参数符号 -datafactors
+	样点数据文件名(csv格式)，文件中包含样点地理坐标(名为:x,y,大小写均可,并且与环境因子图层的空间参考对应)和要推测的属性值，参数符号 -sample
+    要推测的属性名(存在于样点文件的表头中)，参数符号 -target
+    环境相似度阈值，默认值0.5（可选），参数符号 -simithred
+    输出的推测图层文件名，参数符号 -predmap
+    输出的不确定性图层文件名，参数符号 -uncmap
+    params = "-inlayers D:/data/xc/geo.asc#D:/data/xc/planc.asc#D:/data/xc/preci.asc#D:/data/xc/profc.asc#D:/data/xc/slope.asc#D:/data/xc/tempr.asc#D:/data/xc/twi.asc -datatypes categorical#continuous#continuous#continuous#continuous#continuous#continuous -datafactors geology#terrain#climate#terrain#terrain#climate#terrain -sample D:/data/xc/samples_xc.csv -target SOMB -simithred 0.5 -predmap D:/data/test/pred.tif -uncmap D:/data/test/unc.tif";
+	
+#iPSMFilter 
+参数个数：8
+    输入环境因子图层文件名（以#分割），参数符号 -inlayers
+    每个环境因子图层的数据类型，包含类别型(categorical)和连续型(continuous)，（以#分割），参数符号 -datatypes
+    样点数据文件名(csv格式)，文件中包含样点地理坐标(名为:x,y,大小写均可,并且与环境因子图层的空间参考对应)和要推测的属性值，参数符号 -sample
+    要推测的属性名(存在于样点文件的表头中)，参数符号 -target
+    环境相似度阈值，默认值0.5（可选），参数符号 -simithred
+	环形权重衰减系数，默认值0.5（可选），参数符号 -attencoeff
+	输出的推测图层文件名，参数符号 -predmap
+    输出的推测图层文件名，参数符号 -predmap
+    输出的不确定性图层文件名，参数符号 -uncmap
+    params = "-inlayers D:/data/xc/geo.asc#D:/data/xc/planc.asc#D:/data/xc/preci.asc#D:/data/xc/profc.asc#D:/data/xc/slope.asc#D:/data/xc/tempr.asc#D:/data/xc/twi.asc -datatypes categorical#continuous#continuous#continuous#continuous#continuous#continuous -datafactors geology#terrain#climate#terrain#terrain#climate#terrain -sample D:/data/xc/samples_xc.csv -target SOMB -simithred 0.5 -predmap D:/data/test/pred.tif -uncmap D:/data/test/unc.tif";
+	
