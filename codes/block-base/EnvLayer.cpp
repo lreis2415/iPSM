@@ -33,7 +33,7 @@ void EnvLayer::CopyFrame(EnvLayer *lyr) {
 
 
 EnvLayer::EnvLayer(const int layerId, string layerName, const string& filename, const DataTypeEnum dataType):
-    LayerId(layerId), LayerName(layerName), DataType(dataType) {
+    LayerId(layerId), LayerName(layerName), FileName(filename), DataType(dataType) {
 	baseRef = new BaseIO(filename);
 	baseRef->blockNull();
 	XSize = baseRef->getBlockX();	// number of columns
@@ -64,7 +64,7 @@ EnvLayer::EnvLayer(const int layerId, string layerName, const string& filename, 
 }
 
 EnvLayer::EnvLayer(const int layerId, string layerName, const string& filename, const DataTypeEnum dataType, BaseIO *ref) :
-	LayerId(layerId), LayerName(layerName), DataType(dataType) {
+	LayerId(layerId), LayerName(layerName), FileName(filename), DataType(dataType) {
 	baseRef = new BaseIO(filename);
 	baseRef->blockCopy(ref);
 	XSize = baseRef->getBlockX();	// number of columns

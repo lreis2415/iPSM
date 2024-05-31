@@ -49,6 +49,8 @@ public:
 
     ~EnvDataset();
 
+    bool Resample(string& filename, string& resampled_fn, EnvLayer* refLayer);
+
     void AddLayer(EnvLayer* layer) {
         Layers.push_back(layer);
 		LayerSize++;

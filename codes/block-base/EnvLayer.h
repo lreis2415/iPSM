@@ -24,6 +24,7 @@ class EnvLayer {
 public:
     int LayerId;
     string LayerName;
+	string FileName;
 	BaseIO *baseRef;
 	float* EnvData;
 	float* upperBorder;

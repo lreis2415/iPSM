@@ -53,6 +53,10 @@ public:
 
     ~EnvDataset();
 
+    bool CheckLayer(string& filename);
+
+    string Resample(string& filename, EnvLayer* refLayer);
+
 	void AddLayer(EnvLayer* layer);
 
     void RemoveAllLayers();

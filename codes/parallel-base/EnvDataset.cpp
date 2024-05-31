@@ -96,7 +96,18 @@ void EnvDataset::ReadinLayers(vector<string>& envLayerFilenames, const vector<st
 	LoadRef->getCompuLoad(GPRO::ROWWISE_DCMP, process_nums, subWorkBR); // Decompose the spatial computational domain.
 	AddLayer(firstLayer);
 	for (int i = 1; i < layerNum; i++) {
-		AddLayer(new EnvLayer(i, layernames[i], envLayerFilenames[i], getDatatypeFromString(datatypes[i])));
+		if (CheckLayer(envLayerFilenames[i])) {
+			AddLayer(new EnvLayer(i, layernames[i], envLayerFilenames[i], getDatatypeFromString(datatypes[i])));
+		}
+		else {
+			string filename = Resample(envLayerFilenames[i], firstLayer);
+			if (filename == "") {
+				cout << "Error loading file " << envLayerFilenames[i] << endl;
+			}
+			else {
+				AddLayer(new EnvLayer(i, layernames[i], filename, getDatatypeFromString(datatypes[i])));
+			}
+		}
 	}
 	// Step 3. Read file
 	for (int i = 0; i < LayerSize; i++) {
@@ -161,5 +172,74 @@ void EnvDataset::GetEnvUnitValues(const int valPos, float*envVals) {
 	for (int i = 0; i < LayerSize; i++) {
 		envVals[i] = Layers.at(i)->EnvData[valPos];
 	}
+}
+bool EnvDataset::CheckLayer(string& filename) {
+	EnvLayer* lyr = new EnvLayer(0, "", filename, CONTINUOUS);
+	if (TotalX != lyr->XSize || TotalY != lyr->YSize) {
+		cout << "file size do not match";
+		return false;
+	}
+	return true;
+}
+
+string EnvDataset::Resample(string& filename, EnvLayer* refLayer) {
+	//resample
+	GDALAllRegister();
+	GDALDataset* origin_ds = (GDALDataset*)GDALOpen(filename.c_str(), GA_ReadOnly);
+	if (origin_ds == NULL) {
+		cout << "Error opening file " << filename << endl;
+		return "";
+	}
+	GDALRasterBand* origin_band = origin_ds->GetRasterBand(1);
+	GDALDataset* ref_ds = (GDALDataset*)GDALOpen(refLayer->FileName.c_str(), GA_ReadOnly);
+	if (ref_ds == NULL) {
+		cout << "Error opening file " << filename << endl;
+		GDALClose(origin_ds);
+		return "";
+	}
+	string destFile = filename + "_resampled.tif";
+	GDALRasterBand* ref_band = ref_ds->GetRasterBand(1);
+	char* cFileName = new char[destFile.length() + 1];
+	strcpy(cFileName, destFile.c_str());
+	GDALDataType eBDataType = origin_band->GetRasterDataType();
+	GDALDataset* dest_ds = GetGDALDriverManager()->GetDriverByName("GTiff")->Create(cFileName,
+		TotalX, TotalY, 1,
+		eBDataType, NULL);
+	GDALRasterBand* dst_band = dest_ds->GetRasterBand(1);
+	dst_band->SetColorInterpretation(origin_band->GetColorInterpretation());
+	int success = -1;
+	double noDataValue = NODATA;
+	noDataValue = origin_band->GetNoDataValue(&success);
+	if (!success)
+	{
+		GDALClose(origin_ds);
+		GDALClose(dest_ds);
+		GDALClose(ref_ds);
+		return "";
+	}
+	dst_band->SetNoDataValue(noDataValue);
+	GDALColorTable* colorTable = origin_band->GetColorTable();
+	if (colorTable)
+	{
+		dst_band->SetColorTable(colorTable);
+	}
+	dest_ds->SetProjection(ref_ds->GetProjectionRef());
+	double ref_adfGeoTransform[6];
+	ref_ds->GetGeoTransform(ref_adfGeoTransform);
+	dest_ds->SetGeoTransform(ref_adfGeoTransform);
+
+	CPLErr result = GDALReprojectImage(origin_ds, origin_ds->GetProjectionRef(), dest_ds, ref_ds->GetProjectionRef(), GRA_NearestNeighbour, 0.0, 0.0, NULL, NULL, NULL);
+	if (result == CE_Failure) {
+		cout << "Error resampling file " << filename << endl;
+		GDALClose(ref_ds);
+		GDALClose(origin_ds);
+		GDALClose(dest_ds);
+		return "";
+	}
+	GDALClose(ref_ds);
+	GDALClose(origin_ds);
+	GDALClose(dest_ds);
+	return destFile;
+
 }
 }

@@ -94,11 +94,11 @@ namespace solim {
                 for(size_t k = 0; k < nameparts.size() - 1; k++){
                     resampleFile +=nameparts[k];
                 }
-                if(nameparts.size()>2)
+                if(nameparts.size()>1)
                     resampleFile = resampleFile+"_resampleForSoLIM."+nameparts[nameparts.size()-1];
                 else
                     resampleFile = envLayerFilenames[i]+"_resampleForSoLIM.tif";
-                bool success = newLayer->baseRef->resample(LayerRef,resampleFile);
+                bool success = Resample(envLayerFilenames[i],resampleFile, firstLayer);
                 delete newLayer;
                 if(success){
                     newLayer = new EnvLayer(i, LayerNames[i], resampleFile, getDatatypeFromString(datatypes[i]), LayerRef);
@@ -183,5 +183,66 @@ namespace solim {
 		if (blockRank == 0) LayerRef->writeInit();
 		if (EnvData != nullptr)
 			LayerRef->write(globalx, globaly, ny, nx, EnvData, filename);
+	}
+
+
+	bool EnvDataset::Resample(string& filename, string&resampled_fn, EnvLayer* refLayer) {
+		//resample
+		GDALAllRegister();
+		GDALDataset* origin_ds = (GDALDataset*)GDALOpen(filename.c_str(), GA_ReadOnly);
+		if (origin_ds == NULL) {
+			cout << "Error opening file " << filename << endl;
+			return false;
+		}
+		GDALRasterBand* origin_band = origin_ds->GetRasterBand(1);
+		GDALDataset* ref_ds = (GDALDataset*)GDALOpen(refLayer->FileName.c_str(), GA_ReadOnly);
+		if (ref_ds == NULL) {
+			cout << "Error opening file " << filename << endl;
+			GDALClose(origin_ds);
+			return false;
+		}
+		GDALRasterBand* ref_band = ref_ds->GetRasterBand(1);
+		char* cFileName = new char[resampled_fn.length() + 1];
+		strcpy(cFileName, resampled_fn.c_str());
+		GDALDataType eBDataType = origin_band->GetRasterDataType();
+		GDALDataset* dest_ds = GetGDALDriverManager()->GetDriverByName("GTiff")->Create(cFileName,
+			TotalX, TotalY, 1,
+			eBDataType, NULL);
+		GDALRasterBand* dst_band = dest_ds->GetRasterBand(1);
+		dst_band->SetColorInterpretation(origin_band->GetColorInterpretation());
+		int success = -1;
+		double noDataValue = NODATA;
+		noDataValue = origin_band->GetNoDataValue(&success);
+		if (!success)
+		{
+			GDALClose(origin_ds);
+			GDALClose(dest_ds);
+			GDALClose(ref_ds);
+			return false;
+		}
+		dst_band->SetNoDataValue(noDataValue);
+		GDALColorTable* colorTable = origin_band->GetColorTable();
+		if (colorTable)
+		{
+			dst_band->SetColorTable(colorTable);
+		}
+		dest_ds->SetProjection(ref_ds->GetProjectionRef());
+		double ref_adfGeoTransform[6];
+		ref_ds->GetGeoTransform(ref_adfGeoTransform);
+		dest_ds->SetGeoTransform(ref_adfGeoTransform);
+
+		CPLErr result = GDALReprojectImage(origin_ds, origin_ds->GetProjectionRef(), dest_ds, ref_ds->GetProjectionRef(), GRA_NearestNeighbour, 0.0, 0.0, NULL, NULL, NULL);
+		if (result == CE_Failure) {
+			cout << "Error resampling file " << filename << endl;
+			GDALClose(ref_ds);
+			GDALClose(origin_ds);
+			GDALClose(dest_ds);
+			return false;
+		}
+		GDALClose(ref_ds);
+		GDALClose(origin_ds);
+		GDALClose(dest_ds);
+		return true;
+
 	}
 }
