@@ -14,6 +14,10 @@
 #include "transformation.h"
 #include "EnvLayer.h"
 #include "EnvUnit.h"
+#include <gdal.h>
+#include <gdal_priv.h>
+#include <gdalwarper.h>
+#include <ogr_spatialref.h>
 // using namespace std; // Avoid this usage, instead of specific functions. 2019/08/06 ZHULJ
 using std::transform;
 using GPRO::ComputeLayer;
