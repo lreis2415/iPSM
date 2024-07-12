@@ -20,19 +20,19 @@ namespace solim {
 	class ipsmAIDWOperator : public CommonOperator {
 	public:
 		ipsmAIDWOperator() :
-			thred_envsimi(0.5), val_cannot_pred(-1.),
+			thred_envsimi(0.5), val_cannot_pred(NODATA),
 			Map_Prediction(nullptr), Map_Uncertainty(nullptr) {
 		}
 
 		explicit ipsmAIDWOperator(EnvDataset* envDataset)
 			: CommonOperator(envDataset),
-			thred_envsimi(0.5), val_cannot_pred(-1.),
+			thred_envsimi(0.5), val_cannot_pred(NODATA),
 			Map_Prediction(nullptr), Map_Uncertainty(nullptr) {
 		}
 
 		ipsmAIDWOperator(EnvDataset* envDataset, vector<EnvUnit *>& sampleEnvUnits)
 			: CommonOperator(envDataset, sampleEnvUnits),
-			thred_envsimi(0.5), val_cannot_pred(-1.),
+			thred_envsimi(0.5), val_cannot_pred(NODATA),
 			Map_Prediction(nullptr), Map_Uncertainty(nullptr) {
 		}
 
