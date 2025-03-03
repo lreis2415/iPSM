@@ -1,5 +1,11 @@
 # iPSM
 source codes for employing iPSM (individual Predictive Soil Mapping)
+
+supporting:
+- iPSM
+- iPSM-IDW
+- iPSM-AdaptiveIDW
+- iPSM-Neighbor
 ## 1.简介 Introduction
 iPSM是基于地理学第三定律的土壤属性空间推测方法
 ## 2. 文件说明 Document description
