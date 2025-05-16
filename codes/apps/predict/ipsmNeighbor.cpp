@@ -37,6 +37,8 @@ int main(int argc, char *argv[]) {
     string targetVName = "_";
 	double attenuation_coeff = 0;
     double threshold_envSimi = 0.5;
+    double range = 100;
+    double step = 10;
     char* map_pred_fn = "./pred_map.tif";
     char* map_unc_fn = "./unc_map.tif";
     vector<string> scaleLayer_fns;
@@ -84,7 +86,24 @@ int main(int argc, char *argv[]) {
                 sscanf(argv[i], "%lf", &attenuation_coeff);
                 i++;
             } else { ErrExit(); }
-		} else if (strcmp(argv[i], "-simithred") == 0) {
+		}
+        else if (strcmp(argv[i], "-range") == 0) {
+            i++;
+            if (i < argc) {
+                sscanf(argv[i], "%lf", &range);
+                i++;
+            }
+            else { ErrExit(); }
+        }
+        else if (strcmp(argv[i], "-step") == 0) {
+            i++;
+            if (i < argc) {
+                sscanf(argv[i], "%lf", &step);
+                i++;
+            }
+            else { ErrExit(); }
+        }
+        else if (strcmp(argv[i], "-simithred") == 0) {
             i++;
             if (i < argc) {
                 sscanf(argv[i], "%lf", &threshold_envSimi);
@@ -167,13 +186,10 @@ int main(int argc, char *argv[]) {
 
 
 		// 调用ipsmNeighbor推理制图方法
-		cout << "calculating characterisitic size layers ...";
-		//ipsmNbrOp->CalcChrScale(scaleLayer_fns);
-		ipsmNbrOp->Map_scale = escales;
 
 		cout << "running prediction method ...";
-		//ipsmNbrOp->PredictMap_Property(attenuation_coeff);
-		ipsmNbrOp->validate(attenuation_coeff,validPoints);
+		ipsmNbrOp->PredictMap_Property(attenuation_coeff);
+		//ipsmNbrOp->validate(attenuation_coeff,validPoints);
 		cout << "\npredicting finished!" << endl;
 
 #ifdef RasterLayer_H

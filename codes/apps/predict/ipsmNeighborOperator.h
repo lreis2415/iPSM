@@ -13,76 +13,76 @@
 #define IPSMNEIGHBOROPERATOR_H_
 
 #include "CommonOperator.h"
-#include "solim_math.h"//by anym
 #include <iostream>
 #include <iomanip>
+#include <numeric>
 
 // using namespace std; // Avoid this usage, instead of specific functions. 2019/08/06 ZHULJ
 
 namespace solim
 {
-	class ipsmNeighborOperator : public CommonOperator
-	{
-		// constructor functions
-	public:
+    class ipsmNeighborOperator : public CommonOperator
+    {
+        // constructor functions
+    public:
 
-		ipsmNeighborOperator() : CommonOperator()
-		{
-			this->Initialize();
-		}
+        ipsmNeighborOperator() : CommonOperator()
+        {
+            this->Initialize();
+        }
 
         // TODO, use explicit keyword for singe-parameter function. by lj.
-		explicit ipsmNeighborOperator(EnvDataset *envDataset) : CommonOperator(envDataset)
-		{
-			this->Initialize();
-		}
+        explicit ipsmNeighborOperator(EnvDataset *envDataset) : CommonOperator(envDataset)
+        {
+            this->Initialize();
+        }
 
-		ipsmNeighborOperator(EnvDataset *envDataset, vector<EnvUnit *> sampleEnvUnits) :
+        ipsmNeighborOperator(EnvDataset *envDataset, vector<EnvUnit *> sampleEnvUnits) :
             CommonOperator(envDataset, sampleEnvUnits)
-		{
-			this->Initialize();
-		}
+        {
+            this->Initialize();
+        }
 
     ~ipsmNeighborOperator(void) {};
-		// methods
-	public:
-		void Initialize();
+        // methods
+    public:
+        void Initialize();
 
-		//计算平均相似性
-		//识别特征邻域大小
-        bool CalcChrScale(vector<string> map_scale_names);
+        //计算平均相似性
+        //识别特征邻域大小
         bool PredictMap_Property(double alpha);
         void getEnvVector(int pCol, int pRow, EnvLayer *Layer, vector<int>rowCord,
             vector<int>colCord, vector<float> & envVector);
         //void CalcChrScale(EnvLayer * Layer);
         double CalNbrSimi_Variable(int indexPixel, int sampleRow, int sampleCol, 
-			int f, float *pixel,
+            int f, float *pixel,
             EnvUnit *sample, double alpha);
         double CalNbrSimi_Sample(long pixelIndex, float *pixel, EnvUnit *sample,
             double alpha);
-		bool validate(double alpha, vector<EnvUnit*>validPoints);
-		
-		//get the relative coordinate of annulus pixels to the interest pixel
-		//when the outer radius of the annulus is size and the inner radius is size-1
-		//the default shape of the neighborhood is circle
-		static void getAnnulusCord(int size, vector<int>& rCord, vector<int>& cCord);
-		static void CalcAnnulusWeight(double* weight, int scale, double alpha);
-		//calculate the similarity of two env vectors
-		static double CalcVectorSimi(vector<float> e1, vector<float> e2, double NoDataValue);
+        bool validate(double alpha, vector<EnvUnit*>validPoints);
+        
+        //get the relative coordinate of annulus pixels to the interest pixel
+        //when the outer radius of the annulus is size and the inner radius is size-1
+        //the default shape of the neighborhood is circle
+        void getAnnulusCord(int size, vector<int>& rCord, vector<int>& cCord);
+        //calculate the similarity of two env vectors
+        double CalcVectorSimi(vector<float> e1, vector<float> e2, double NoDataValue,int f);
+        void getModeUnique(vector<float> v, int& mode, int& unique_num);
 
-
-
-		// fields
-	public:
+        // fields
+    public:
         double thred_envsimi;
         double val_cannot_pred;
         int nbrMin;//min neighborhood size by anym
         int nbrMax;//max neighborhood size by anym
-        EnvDataset *Map_scale; //anym 每个变量每个位置的特征邻域
-		EnvLayer *Map_Prediction;
-		EnvLayer *Map_Uncertainty;
-		string map_predict_filename;
-		string map_uncer_filename;
-	};
+        EnvLayer *Map_Prediction;
+        EnvLayer *Map_Uncertainty;
+        string map_predict_filename;
+        string map_uncer_filename;
+        int n_step;
+        int n_size;
+        int n_step_amplifier;
+        int n_range;
+    };
 }
 #endif
